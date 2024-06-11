@@ -7,7 +7,7 @@ class Board():
         self.height = height
         self.boardState = np.zeros((self.width, self.height))
     def editBoard(value,row, col):
-        
+        # this should only be on dev
         pass
     def check(self):
         print(self.boardState)

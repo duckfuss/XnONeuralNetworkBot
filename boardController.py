@@ -7,3 +7,4 @@ class Board():
     def check(self):
         print(self.boardState)
 
+# this is a test

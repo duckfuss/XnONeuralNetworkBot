@@ -15,13 +15,13 @@ class Board():
     def check(self):
         print(self.boardState)
 
-    def fancyPrint(self):
+    def fancyPrint(self, charDict = {0:"  ", 1:"❌", 2:"⭕️"}):
         '''prints self.boardState using nice ascii grid chars'''
         for row in range(self.rows):
             print(" ", end="")
             for col in range(self.cols-1):
-                print(self.boardState[row][col], end=" ┃ ")
-            print(self.boardState[row][col+1])
+                print(charDict[self.boardState[row][col]], end="┃ ")
+            print(charDict[self.boardState[row][col+1]])
             if row != self.rows-1:
                 print("━", end="")
                 for i in range(self.cols-1):
@@ -29,4 +29,5 @@ class Board():
                 print("━━")
 bob = Board(6,5)
 bob.editBoard(1,4,4)
+bob.editBoard(1,2,3)
 bob.fancyPrint()

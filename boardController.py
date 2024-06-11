@@ -11,8 +11,17 @@ class Board():
         print(self.boardState[row][col])
         self.boardState[row][col] = value
 
-        pass
-    def check(self):
+    def check(self, nInRow):
+        '''
+        checks for n in a row
+        nInRow MUST be < self.rows and self.cols
+        '''
+        
+        for row in range(self.rows):
+                for col in range(self.cols):
+                    active = self.boardState[row][col]
+
+                    pass
         print(self.boardState)
 
     def fancyPrint(self, charDict = {0:"  ", 1:"❌", 2:"⭕️"}):
@@ -27,7 +36,6 @@ class Board():
                 for i in range(self.cols-1):
                     print("━━╋━", end="")
                 print("━━")
+
 bob = Board(6,5)
-bob.editBoard(1,4,4)
-bob.editBoard(1,2,3)
 bob.fancyPrint()

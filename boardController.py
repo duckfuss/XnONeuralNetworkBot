@@ -8,6 +8,7 @@ class Board():
         self.boardState = np.zeros((self.rows, self.cols), dtype=int)
         print(self.boardState)
     def editBoard(self, value, row, col):
+        '''allows board to be easily edited from other files'''
         print(self.boardState[row][col])
         self.boardState[row][col] = value
 
@@ -27,6 +28,7 @@ class Board():
         print(Tv, Th, TdU, TdD)
     
     def searchAhead(self, direc, row, col, n, positive):
+        '''Utility function called only by check(), don't call elsewhere'''
         nD = {"Vert":[1,0], "Hor":[0,1], "diagUp":[1,-1], "diagDo":[1,1]} # neighbour data
         for i in range(n-1):
             row += nD[direc][0]
@@ -37,10 +39,8 @@ class Board():
             else:
                 return 0
         return 1
-
-
     def fancyPrint(self, charDict = {0:"  ", 1:"❌", 2:"⭕️"}):
-        '''prints self.boardState using nice ascii grid chars'''
+        '''Utility function that prints self.boardState using nice ascii grid chars'''
         for row in range(self.rows):
             print(" ", end="")
             for col in range(self.cols-1):
@@ -51,10 +51,3 @@ class Board():
                 for i in range(self.cols-1):
                     print("━━╋━", end="")
                 print("━━")
-
-bob = Board(6,5)
-bob.editBoard(1,2,2)
-bob.editBoard(1,1,3)
-bob.editBoard(1,0,4)
-bob.fancyPrint()
-bob.check(3, 1)

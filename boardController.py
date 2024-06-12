@@ -26,6 +26,10 @@ class Board():
                     TdU += self.searchAhead("diagUp", row, col, nInRow, value)
                     TdD += self.searchAhead("diagDo", row, col, nInRow, value)
         print(Tv, Th, TdU, TdD)
+        if Tv + Th + TdU + TdD > 0:
+            return True
+        else:
+            return False
     
     def searchAhead(self, direc, row, col, n, positive):
         '''Utility function called only by check(), don't call elsewhere'''

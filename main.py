@@ -1,7 +1,10 @@
 import boardController
-
+import network
 # initialisations
-board = boardController.Board(6,5)
+rows, cols = 6,5
+board = boardController.Board(rows,cols)
+duck = network.Network([rows*cols, 20, 10])
+duck.generateNetwork()
 turns = 0
 
 # Variables
@@ -12,7 +15,7 @@ def askPlayer():
     col = int(input("what col?: "))
     return row, col
 
-# game loop:
+# training game loop:
 while True:
     board.fancyPrint()
     if turns % 2 == 0:

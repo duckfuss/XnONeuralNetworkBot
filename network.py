@@ -7,10 +7,10 @@ random.seed(5)
 
 class Network():
     def __init__(self, layerData) -> None:
-        self.layerData = layerData
+        self.layerData = layerData # [no. neurons in layer 1, no.neurons in layer 2,...]
         self.layersList = [] # list of objects 
         
-    def generateNetwork(self, dataType="MNIST"):
+    def generateNetwork(self):
         for i in range(1,len(self.layerData)): # don't include input layer
             self.layersList.append(Layer(self.layerData[i-1], self.layerData[i]))
 
@@ -40,23 +40,12 @@ class Network():
             inputs = layer.computeOutput(inputs, verbose)
         return inputs # final looped input is the output
 
-    def performanceTest(self, tests):
-        successes = 0
-        for index in range(tests):
-            inputs = (self.tData.testIm[index].flatten().reshape(-1,1))/256
-            for layer in self.layersList:
-                inputs = layer.computeOutput(inputs)
-            if np.argmax(inputs) == self.tData.testLab[index]:
-                successes += 1
-        return successes
-
     def cost(self, actual, desired, verbose=False):
         diff = actual - desired
         if verbose:
             print("\nactual: \n", actual, "\ndesired:\n", desired)
             print("\ndifference:\n",diff)
         return np.vdot(diff,diff)
-
 
 class Layer():
     def __init__(self, inputSize, outputSize) -> None:

@@ -5,9 +5,9 @@ import numpy as np
 # initialisations
 rows, cols = 6,5
 board = boardController.Board(rows,cols)
-duckX = network.Network([rows*cols, 20, rows+cols], 1)
+duckX = network.Network([rows*cols, 20, rows*cols], 1)
 duckX.generateNetwork()
-duckO = network.Network([rows*cols, 20, rows+cols], 2)
+duckO = network.Network([rows*cols, 20, rows*cols], 2)
 duckO.generateNetwork()
 duckList = ["padding so index 1 = x etc.", duckX, duckO]
 turns = 0
@@ -21,7 +21,7 @@ def askPlayer():
     return row, col
 
 def consultDuck(boardState, turn):
-    output = duckList[turn].compute(boardState)
+    output = duckList[turn].compute(boardState).reshape(rows,cols)
     (row,col) = np.unravel_index(output.argmax(), output.shape)
     return row, col
 
@@ -35,7 +35,7 @@ while True:
             print("X wins")
             break
     else:
-        row,col = consultDuck(2)
+        row,col = consultDuck(board.boardState, 2)
         board.editBoard(2,row,col)
         if board.check(nInRow, 2):
             print("O wins")

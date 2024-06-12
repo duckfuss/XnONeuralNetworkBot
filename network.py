@@ -6,19 +6,19 @@ np.random.seed(5)
 random.seed(5)
 
 class Network():
-    def __init__(self, layerData) -> None:
+    def __init__(self, layerData, turn) -> None:
         self.layerData = layerData # [no. neurons in layer 1, no.neurons in layer 2,...]
         self.layersList = [] # list of objects 
+        self.turn = turn # 1 = X, 2 = O
         
     def generateNetwork(self):
         for i in range(1,len(self.layerData)): # don't include input layer
             self.layersList.append(Layer(self.layerData[i-1], self.layerData[i]))
 
-    def trainNetwork(self, samples):
+    def trainNetwork(self, gameData):
         '''trains the network with "samples" no. examples using data from dataType'''
         # FEED FORWARDS
-        trainingIndex = random.sample(range(0,len(self.tData.trainIm)), samples)
-        for i in trainingIndex:
+        for i in range(gameData):
             # calculate desired outputs
             desired = np.zeros(self.layerData[-1]).reshape(-1,1)
             desired[self.tData.trainLab[i]] = 1
@@ -31,10 +31,10 @@ class Network():
                 # loops through a shallow copy of reversed list
                 layerCost = layer.backpropogateLayer(layerCost)
         for layer in self.layersList:
-            layer.gradDesc(samples)
+            layer.gradDesc(len(gameData))
 
-    def compute(self, inputIndex, verbose=False):
-        inputs = (self.tData.trainIm[inputIndex].flatten().reshape(-1,1))/256
+    def compute(self, inputs, verbose=False):
+        inputs = (inputs.flatten().reshape(-1,1))/2
         for layer in self.layersList:
             if verbose: print("\n\nLayer no: ", self.layersList.index(layer))
             inputs = layer.computeOutput(inputs, verbose)

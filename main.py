@@ -29,7 +29,7 @@ def consultDuck(boardState, turn):
 while True:
     board.fancyPrint()
     if turns % 2 == 0:
-        row, col = askPlayer()
+        row, col = consultDuck(board.boardState, 1)
         board.editBoard(1,row,col)
         if board.check(nInRow, 1):
             print("X wins")

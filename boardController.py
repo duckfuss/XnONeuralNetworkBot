@@ -6,11 +6,13 @@ class Board():
         self.rows = rows
         self.cols = cols
         self.boardState = np.zeros((self.rows, self.cols), dtype=int)
+        self.boardHistory = []
         print(self.boardState)
     def editBoard(self, value, row, col):
         '''allows board to be easily edited from other files'''
         print(self.boardState[row][col])
         self.boardState[row][col] = value
+        self.boardHistory.append(self.boardState)
 
     def check(self, nInRow, value):
         '''
@@ -43,6 +45,7 @@ class Board():
             else:
                 return 0
         return 1
+
     def fancyPrint(self, charDict = {0:"  ", 1:"❌", 2:"⭕️"}):
         '''Utility function that prints self.boardState using nice ascii grid chars'''
         for row in range(self.rows):

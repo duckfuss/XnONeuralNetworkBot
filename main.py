@@ -12,7 +12,7 @@ duckO.generateNetwork()
 duckList = ["padding so index 1 = x etc.", duckX, duckO]
 turns = 0
 
-# Variables
+# Variables :)
 nInRow = 3
 
 def askPlayer():

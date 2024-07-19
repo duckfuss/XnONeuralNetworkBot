@@ -42,19 +42,14 @@ class Board():
     def searchAhead(self, direc, row, col, n, positive):
         '''Utility function called only by check(), don't call elsewhere'''
         nD = {"Vert":[1,0], "Hor":[0,1], "diagUp":[-1,1], "diagDo":[1,1]} # neighbour data
-        rowI, colI = row, col
         for i in range(n-1):
             row += nD[direc][0]
             col += nD[direc][1]
-            if direc == "diagUp" and rowI == 1 and colI == 0:
-                print("rc", row,col)
-                print("nD:", nD[direc][0], nD[direc][1])
-            if col < self.cols and row < self.rows:# and col >= 0 and row >= 0:
+            if col < self.cols and row < self.rows and col >= 0 and row >= 0:
                 if self.boardState[row][col] != positive:   
                     return 0
             else:   
                 return 0
-        print("diagUp\n", self.boardState, "\n initial row,col: ", rowI, colI)
         return 1
 
     def fancyPrint(self, charDict = {0:"  ", 1:"❌", 2:"⭕️"}):

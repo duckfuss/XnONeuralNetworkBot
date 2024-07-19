@@ -35,17 +35,37 @@ def playerGameLoop(order={1:"network", 2:"player"}):
         if i % 2 == 0:  activePlayer, turn = order[1], 1
         else:           activePlayer, turn = order[2], 2
         if activePlayer == "network":
+            print("\nCOMPUTER TURN")
+            board.fancyPrint()
             row, col = consultDuck(board.boardState, turn, verbose=True)
         elif activePlayer == "player":
+            print("\nPLAYER TURN")
             board.fancyPrint()
             row, col = askPlayer()
         board.editBoard(turn,row,col)
-        if board.check(nInRow, activePlayer):
-            if activePlayer == 1:   print("----------------------------X wins")
-            else:                   print("----------------------------O wins")
+        if board.check(nInRow, turn):
+            board.fancyPrint()
+            if turn == 1:   print("----------------------------X wins")
+            else:           print("----------------------------O wins")
             return activePlayer
     print("nobody wins")
 
+def multiplayerGameLoop():
+    for i in range((rows * cols)+5):
+        board.fancyPrint()
+        if i % 2 == 0:
+            print("Xs turn")
+            player = 1
+        else:
+            print("Os turn")
+            player = 2
+        row, col = askPlayer()
+        board.editBoard(player, row, col)
+        if board.check(nInRow, player):
+            board.fancyPrint()
+            if player == 1: print("----------------------------X wins")
+            else:           print("----------------------------O wins")
+            return
 
 def computerGameLoop(maxTurns=10, verbose=False, wait=False):
     '''
@@ -53,16 +73,18 @@ def computerGameLoop(maxTurns=10, verbose=False, wait=False):
     Changing turns to 1 will allow O to go first
     '''
     for turns in range(maxTurns):
+        if turns % 2 == 0:  activePlayer = 1
+        else:               activePlayer = 2
+        row, col = consultDuck(board.boardState, activePlayer)
         if verbose: 
             if wait: time.sleep(1) # debug
             board.fancyPrint()
             print("turns taken:", turns)
-        if turns % 2 == 0:  activePlayer = 1
-        else:               activePlayer = 2
-        row, col = consultDuck(board.boardState, activePlayer)
-        board.editBoard(activePlayer,row,col)
+            print("next coords:", row, col)
+        board.editBoard(activePlayer, row, col)
         if board.check(nInRow, activePlayer):
             if verbose:
+                board.fancyPrint()
                 if activePlayer == 1:   print("----------------------------X wins")
                 else:                   print("----------------------------O wins")
             return activePlayer
@@ -76,17 +98,20 @@ def trainAlgorithms(winner):
     
 
 ### TRAINING ###
-iterations = 10**4
+iterations = 10**3
 for i in range(iterations):
     winner = computerGameLoop()
     trainAlgorithms(winner)
     board.resetBoard()
-    if i % (iterations/100) == 0:
+    if i % (iterations/10) == 0:
+        computerGameLoop(verbose=True)
         print(i, (100*i)/iterations, "%")
 
 
-#computerGameLoop(verbose=True, wait=True)
-#board.fancyPrint()
+computerGameLoop(verbose=True, wait=True)
+board.fancyPrint()
+print("\n\n\n")
 while True:
-    playerGameLoop()
     board.resetBoard()
+    #multiplayerGameLoop()
+    playerGameLoop()

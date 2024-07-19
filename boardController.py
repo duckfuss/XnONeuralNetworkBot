@@ -9,6 +9,10 @@ class Board():
         self.boardHistory = []
         print(self.boardState)
 
+    def resetBoard(self):
+        self.boardState = np.zeros((self.rows, self.cols), dtype=int)
+        self.boardHistory = []
+
     def editBoard(self, value, row, col):
         '''allows board to be easily edited from other files'''
         print(self.boardState[row][col])

@@ -30,31 +30,58 @@ def consultDuck(boardState, player):
     print(output)
     return row, col
 
+def playerGameLoop(order={1:"network", 2:"player"}):
+    for i in range((rows * cols)+5):
+        if i % 2 == 0:  activePlayer, turn = order[1], 1
+        else:           activePlayer, turn = order[2], 2
+        if activePlayer == "network":
+            row, col = consultDuck(board.boardState, turn)
+        elif activePlayer == "player":
+            board.fancyPrint()
+            row, col = askPlayer()
+        board.editBoard(turn,row,col)
+        if board.check(nInRow, activePlayer):
+            if activePlayer == 1:   print("----------------------------X wins")
+            else:                   print("----------------------------O wins")
+            return activePlayer
+    print("nobody wins")
 
-def computerGameLoop(maxTurns=10):
+
+def computerGameLoop(maxTurns=10, verbose=False, wait=False):
     '''
     Plays one game of duckX vs duckY
     Changing turns to 1 will allow O to go first
     '''
     for turns in range(maxTurns):
-        time.sleep(0.1) # debug
-        board.fancyPrint()
-        print("turns taken:", turns)
+        if verbose: 
+            if wait: time.sleep(1) # debug
+            board.fancyPrint()
+            print("turns taken:", turns)
         if turns % 2 == 0:  activePlayer = 1
         else:               activePlayer = 2
         row, col = consultDuck(board.boardState, activePlayer)
         board.editBoard(activePlayer,row,col)
         if board.check(nInRow, activePlayer):
-            if activePlayer == 1:   print("X wins")
-            else:                   print("O wins")
+            if verbose:
+                if activePlayer == 1:   print("----------------------------X wins")
+                else:                   print("----------------------------O wins")
             return activePlayer
     return 0 # timeout -> nobody won :(
 
-def trainAlgorithm(winner):
+def trainAlgorithms(winner):
     '''Post-game training and analysis'''
     duckList[1].trainNetwork(boardHist=board.boardHistory, winner=winner)
     duckList[2].trainNetwork(boardHist=board.boardHistory, winner=winner)
 
+    
+
 ### TRAINING ###
-winner = computerGameLoop()
-trainAlgorithm(winner)
+for i in range(1000):
+    winner = computerGameLoop()
+    trainAlgorithms(winner)
+    board.resetBoard()
+
+
+#computerGameLoop(verbose=True, wait=True)
+#board.fancyPrint()
+playerGameLoop()

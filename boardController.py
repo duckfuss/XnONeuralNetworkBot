@@ -24,7 +24,6 @@ class Board():
         checks for n in a row
         nInRow MUST be ≤ self.rows and self.cols
         ''' 
-        print(value, nInRow)
         Tv,Th,TdU,TdD = 0,0,0,0 # totals for vert, horiz., ...
         for row in range(self.rows):
             for col in range(self.cols):
@@ -33,7 +32,6 @@ class Board():
                     Th  += self.searchAhead("Hor", row, col, nInRow, value)
                     TdU += self.searchAhead("diagUp", row, col, nInRow, value)
                     TdD += self.searchAhead("diagDo", row, col, nInRow, value)
-        print(Tv, Th, TdU, TdD)
         if Tv + Th + TdU + TdD > 0:
             return True
         else:

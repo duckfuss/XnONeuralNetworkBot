@@ -45,8 +45,8 @@ def playerGameLoop(order={1:"network", 2:"player"}):
         board.editBoard(turn,row,col)
         if board.check(nInRow, turn):
             board.fancyPrint()
-            if turn == 1:   print("----------------------------X wins")
-            else:           print("----------------------------O wins")
+            if turn == 1:   print("----------------------------X wins\n")
+            else:           print("----------------------------O wins\n")
             return activePlayer
     print("nobody wins")
 
@@ -63,8 +63,8 @@ def multiplayerGameLoop():
         board.editBoard(player, row, col)
         if board.check(nInRow, player):
             board.fancyPrint()
-            if player == 1: print("----------------------------X wins")
-            else:           print("----------------------------O wins")
+            if player == 1: print("----------------------------X wins\n")
+            else:           print("----------------------------O wins\n")
             return
 
 def computerGameLoop(maxTurns=10, verbose=False, wait=False):
@@ -85,9 +85,10 @@ def computerGameLoop(maxTurns=10, verbose=False, wait=False):
         if board.check(nInRow, activePlayer):
             if verbose:
                 board.fancyPrint()
-                if activePlayer == 1:   print("----------------------------X wins")
-                else:                   print("----------------------------O wins")
+                if activePlayer == 1:   print("---------------------------- X wins\n")
+                else:                   print("---------------------------- O wins\n")
             return activePlayer
+    if verbose: print("---------------------------- DRAW\n")
     return 0 # timeout -> nobody won :(
 
 def trainAlgorithms(winner):
@@ -98,7 +99,7 @@ def trainAlgorithms(winner):
     
 
 ### TRAINING ###
-iterations = 10**3
+iterations = 10**6
 for i in range(iterations):
     winner = computerGameLoop()
     trainAlgorithms(winner)

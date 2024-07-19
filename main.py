@@ -26,18 +26,18 @@ def askPlayer():
 
 def consultDuck(boardState, player):
     output = duckList[player].compute(boardState).reshape(rows,cols)
-    (row,col) = np.unravel_index(output.argmax(), output.shape)
+    (row,col) = np.unravel_index(output.argmax(), output.shape) # take the highest valued coord
+    print(output)
     return row, col
 
 
-def computerGameLoop(turns=0, maxTurns=10):
+def computerGameLoop(maxTurns=10):
     '''
     Plays one game of duckX vs duckY
     Changing turns to 1 will allow O to go first
     '''
-    while turns < maxTurns:
+    for turns in range(maxTurns):
         time.sleep(0.1) # debug
-        turns += 1
         board.fancyPrint()
         print("turns taken:", turns)
         if turns % 2 == 0:  activePlayer = 1
@@ -50,15 +50,11 @@ def computerGameLoop(turns=0, maxTurns=10):
             return activePlayer
     return 0 # timeout -> nobody won :(
 
-def computerTraining(winner):
-    '''
-    Post-game training and analysis
-    '''
-    # process winner
-
-    
-    pass
+def trainAlgorithm(winner):
+    '''Post-game training and analysis'''
+    duckList[1].trainNetwork(boardHist=board.boardHistory, winner=winner)
+    duckList[2].trainNetwork(boardHist=board.boardHistory, winner=winner)
 
 ### TRAINING ###
 winner = computerGameLoop()
-
+trainAlgorithm(winner)

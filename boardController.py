@@ -8,13 +8,14 @@ class Board():
         self.boardState = np.zeros((self.rows, self.cols), dtype=int)
         self.boardHistory = []
         print(self.boardState)
+
     def editBoard(self, value, row, col):
         '''allows board to be easily edited from other files'''
         print(self.boardState[row][col])
         if self.boardState[row][col] != 1:
             # Currently the only punishment for illegal placement is missing a turn
             self.boardState[row][col] = value
-        self.boardHistory.append(self.boardState)
+        self.boardHistory.append([self.boardState, (row,col)])
         
     def check(self, nInRow, value):
         '''

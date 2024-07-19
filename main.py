@@ -24,10 +24,10 @@ def askPlayer():
     col = int(input("what col?: "))
     return row, col
 
-def consultDuck(boardState, player):
+def consultDuck(boardState, player, verbose=False):
     output = duckList[player].compute(boardState).reshape(rows,cols)
     (row,col) = np.unravel_index(output.argmax(), output.shape) # take the highest valued coord
-    print(output)
+    if verbose: print(output)
     return row, col
 
 def playerGameLoop(order={1:"network", 2:"player"}):
@@ -76,10 +76,13 @@ def trainAlgorithms(winner):
     
 
 ### TRAINING ###
-for i in range(1000):
+iterations = 10**5
+for i in range(iterations):
     winner = computerGameLoop()
     trainAlgorithms(winner)
     board.resetBoard()
+    if i % iterations/100 == 0:
+        print(i)
 
 
 #computerGameLoop(verbose=True, wait=True)

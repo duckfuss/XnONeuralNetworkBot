@@ -30,15 +30,16 @@ def consultDuck(boardState, turn):
     return row, col
 
 
-def trainingGameLoop(turns=0, maxTurns=100):
+def computerGameLoop(turns=0, maxTurns=100):
     '''
     Plays one game of duckX vs duckY
     Changing turns to 1 will allow O to go first
     '''
     while turns < maxTurns:
-        time.sleep(1)
+        time.sleep(0.1) # debug
         turns += 1
         board.fancyPrint()
+        print("turns taken:", turns)
         if turns % 2 == 0:  activePlayer = 1
         else:               activePlayer = 2
         row, col = consultDuck(board.boardState, activePlayer)
@@ -52,4 +53,4 @@ def trainingGameLoop(turns=0, maxTurns=100):
 
 
 ### TRAINING ###
-trainingGameLoop()
+computerGameLoop()

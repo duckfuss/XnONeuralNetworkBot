@@ -1,9 +1,10 @@
 import random
 import numpy as np
+import math as maths
 # numpy setup
 np.set_printoptions(suppress=True,linewidth=np.nan)
-np.random.seed(5)
-random.seed(5)
+np.random.seed(1)
+random.seed(1)
 
 class Network():
     def __init__(self, layerData, turn) -> None:
@@ -27,18 +28,19 @@ class Network():
         # FEED FORWARDS
         for i in range(self.turn-1, len(boardHist), 2):
             # loop over every other boardstate, (state 1 always goes first)
-            # calculate desired outputs
             boardState = boardHist[i][0]    # array of board state
             move = boardHist[i][1]          # tuple (row,col)
+            
             if winner == self.turn:
                 desired = np.zeros((rows,cols))
                 desired[move[0]][move[1]] = 1
-            elif winner != 0:
-                desired = np.full((rows,cols), 0.5)
+            else:
+            #elif winner != 0:
+                desired = np.full((rows,cols), 1)
                 desired[move[0]][move[1]] = 0
-            else: # draw/timeout
-                desired = np.full((rows,cols), 0.5)
-                desired[move[0]][move[1]] /= 2
+            #else: # draw/timeout
+            #    desired = np.full((rows,cols), 0.5)
+            #    desired[move[0]][move[1]] /= 2
             # re-calculate actual output
             output = self.compute(boardState).reshape(rows,cols)
             # calculate cost
@@ -50,7 +52,7 @@ class Network():
                 layerCost = layer.backpropogateLayer(layerCost)
         for layer in self.layersList:
             # apply the changes
-            layer.gradDesc(len(boardHist))
+            layer.gradDesc(len(boardHist), rate=10)
 
     def compute(self, inputs, verbose=False):
         inputs = (inputs.flatten().reshape(-1,1))/2

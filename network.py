@@ -15,23 +15,42 @@ class Network():
         for i in range(1,len(self.layerData)): # don't include input layer
             self.layersList.append(Layer(self.layerData[i-1], self.layerData[i]))
 
-    def trainNetwork(self, gameData):
-        '''trains the network with "samples" no. examples using data from dataType'''
+    def trainNetwork(self, boardHist, winner):
+        '''
+        Trains the network from the boardHist(ory)
+        Current rules (apply equally to every past state!):
+        - if win, desired state = array of 0s with a 1 on "correct choice"
+        - if loss, desired state = array of 0.5s with a 0 on "wrong choice"
+        - if draw, desired state = array of 0.5s and "wrongish choice" is halved
+        '''
+        rows, cols = len(boardHist[0][0]), len(boardHist[0][0][0])
         # FEED FORWARDS
-        for i in range(gameData):
+        for i in range(self.turn-1, len(boardHist), 2):
+            # loop over every other boardstate, (state 1 always goes first)
             # calculate desired outputs
-            desired = np.zeros(self.layerData[-1]).reshape(-1,1)
-            desired[self.tData.trainLab[i]] = 1
-            # calculate actual output
-            output = self.compute(i)
+            boardState = boardHist[i][0]    # array of board state
+            move = boardHist[i][1]          # tuple (row,col)
+            if winner == self.turn:
+                desired = np.zeros((rows,cols))
+                desired[move[0]][move[1]] = 1
+            elif winner != 0:
+                desired = np.full((rows,cols), 0.5)
+                desired[move[0]][move[1]] = 0
+            else: # draw/timeout
+                desired = np.full((rows,cols), 0.5)
+                desired[move[0]][move[1]] /= 2
+            # re-calculate actual output
+            output = self.compute(boardState).reshape(rows,cols)
             # calculate cost
             #  -> cost = self.cost(output,desired)
             layerCost = 2*(output-desired)
+            layerCost = np.reshape(layerCost, (-1,1))
             for layer in self.layersList[::-1]:
                 # loops through a shallow copy of reversed list
                 layerCost = layer.backpropogateLayer(layerCost)
         for layer in self.layersList:
-            layer.gradDesc(len(gameData))
+            # apply the changes
+            layer.gradDesc(len(boardHist))
 
     def compute(self, inputs, verbose=False):
         inputs = (inputs.flatten().reshape(-1,1))/2

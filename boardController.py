@@ -7,19 +7,22 @@ class Board():
         self.cols = cols
         self.boardState = np.zeros((self.rows, self.cols), dtype=int)
         self.boardHistory = []
-        print(self.boardState)
+
+    def resetBoard(self):
+        self.boardState = np.zeros((self.rows, self.cols), dtype=int)
+        self.boardHistory = []
+
     def editBoard(self, value, row, col):
         '''allows board to be easily edited from other files'''
-        print(self.boardState[row][col])
-        if self.boardState[row][col] != 1:
+        if self.boardState[row][col] == 0:
             # Currently the only punishment for illegal placement is missing a turn
             self.boardState[row][col] = value
-        self.boardHistory.append(self.boardState)
+        self.boardHistory.append([self.boardState, (row,col)])
         
     def check(self, nInRow, value):
         '''
         checks for n in a row
-        nInRow MUST be < self.rows and self.cols
+        nInRow MUST be ≤ self.rows and self.cols
         ''' 
         Tv,Th,TdU,TdD = 0,0,0,0 # totals for vert, horiz., ...
         for row in range(self.rows):
@@ -29,7 +32,6 @@ class Board():
                     Th  += self.searchAhead("Hor", row, col, nInRow, value)
                     TdU += self.searchAhead("diagUp", row, col, nInRow, value)
                     TdD += self.searchAhead("diagDo", row, col, nInRow, value)
-        print(Tv, Th, TdU, TdD)
         if Tv + Th + TdU + TdD > 0:
             return True
         else:
@@ -37,13 +39,15 @@ class Board():
     
     def searchAhead(self, direc, row, col, n, positive):
         '''Utility function called only by check(), don't call elsewhere'''
-        nD = {"Vert":[1,0], "Hor":[0,1], "diagUp":[1,-1], "diagDo":[1,1]} # neighbour data
+        nD = {"Vert":[1,0], "Hor":[0,1], "diagUp":[-1,1], "diagDo":[1,1]} # neighbour data
         for i in range(n-1):
             row += nD[direc][0]
             col += nD[direc][1]
-            if col < self.cols and row < self.rows:
-                if self.boardState[row][col] != positive:   return 0
-            else:   return 0
+            if col < self.cols and row < self.rows and col >= 0 and row >= 0:
+                if self.boardState[row][col] != positive:   
+                    return 0
+            else:   
+                return 0
         return 1
 
     def fancyPrint(self, charDict = {0:"  ", 1:"❌", 2:"⭕️"}):

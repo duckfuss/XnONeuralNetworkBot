@@ -11,9 +11,11 @@ class Board():
     def editBoard(self, value, row, col):
         '''allows board to be easily edited from other files'''
         print(self.boardState[row][col])
-        self.boardState[row][col] = value
+        if self.boardState[row][col] != 1:
+            # Currently the only punishment for illegal placement is missing a turn
+            self.boardState[row][col] = value
         self.boardHistory.append(self.boardState)
-
+        
     def check(self, nInRow, value):
         '''
         checks for n in a row
@@ -40,10 +42,8 @@ class Board():
             row += nD[direc][0]
             col += nD[direc][1]
             if col < self.cols and row < self.rows:
-                if self.boardState[row][col] != positive:
-                    return 0
-            else:
-                return 0
+                if self.boardState[row][col] != positive:   return 0
+            else:   return 0
         return 1
 
     def fancyPrint(self, charDict = {0:"  ", 1:"❌", 2:"⭕️"}):

@@ -4,7 +4,7 @@ import numpy as np
 import time
 
 # initialisations
-rows, cols = 6,5
+rows, cols = 3,3
 board = boardController.Board(rows,cols)
 
 duckX = network.Network([rows*cols, 10, rows*cols], 1)
@@ -14,7 +14,7 @@ duckO = network.Network([rows*cols, 10, rows*cols], 2)
 duckO.generateNetwork()
 
 duckList = ["padding so index 1 = x etc.", duckX, duckO]
-
+# 1 = X, 2 = Y
 
 # Variables :)
 nInRow = 3
@@ -24,13 +24,13 @@ def askPlayer():
     col = int(input("what col?: "))
     return row, col
 
-def consultDuck(boardState, turn):
-    output = duckList[turn].compute(boardState).reshape(rows,cols)
+def consultDuck(boardState, player):
+    output = duckList[player].compute(boardState).reshape(rows,cols)
     (row,col) = np.unravel_index(output.argmax(), output.shape)
     return row, col
 
 
-def computerGameLoop(turns=0, maxTurns=100):
+def computerGameLoop(turns=0, maxTurns=10):
     '''
     Plays one game of duckX vs duckY
     Changing turns to 1 will allow O to go first
@@ -50,7 +50,14 @@ def computerGameLoop(turns=0, maxTurns=100):
             return activePlayer
     return 0 # timeout -> nobody won :(
 
-
+def computerTraining(winner):
+    '''
+    Post-game training and analysis
+    '''
+    # process winner
+    
+    pass
 
 ### TRAINING ###
-computerGameLoop()
+winner = computerGameLoop()
+

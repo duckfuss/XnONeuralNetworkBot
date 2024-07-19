@@ -27,7 +27,7 @@ def askPlayer():
 def consultDuck(boardState, player, verbose=False):
     output = duckList[player].compute(boardState).reshape(rows,cols)
     (row,col) = np.unravel_index(output.argmax(), output.shape) # take the highest valued coord
-    if verbose: print(output)
+    if verbose: print(output, row, col)
     return row, col
 
 def playerGameLoop(order={1:"network", 2:"player"}):
@@ -35,7 +35,7 @@ def playerGameLoop(order={1:"network", 2:"player"}):
         if i % 2 == 0:  activePlayer, turn = order[1], 1
         else:           activePlayer, turn = order[2], 2
         if activePlayer == "network":
-            row, col = consultDuck(board.boardState, turn)
+            row, col = consultDuck(board.boardState, turn, verbose=True)
         elif activePlayer == "player":
             board.fancyPrint()
             row, col = askPlayer()
@@ -76,15 +76,17 @@ def trainAlgorithms(winner):
     
 
 ### TRAINING ###
-iterations = 10**5
+iterations = 10**4
 for i in range(iterations):
     winner = computerGameLoop()
     trainAlgorithms(winner)
     board.resetBoard()
-    if i % iterations/100 == 0:
-        print(i)
+    if i % (iterations/100) == 0:
+        print(i, (100*i)/iterations, "%")
 
 
 #computerGameLoop(verbose=True, wait=True)
 #board.fancyPrint()
-playerGameLoop()
+while True:
+    playerGameLoop()
+    board.resetBoard()

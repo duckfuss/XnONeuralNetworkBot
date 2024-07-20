@@ -30,9 +30,14 @@ def consultDuck(boardState, player, verbose=False):
     if verbose: print(output, row, col)
     return row, col
 
-def consultEvilDuck(boardState):
-    
-    pass
+def consultEvilDuck(boardState, verbose=False):
+    '''This bot chooses next pos completly randomly'''
+    freeSpaces = np.where(boardState == 0)
+    index = np.random.randint(len(freeSpaces[0]))
+    row = freeSpaces[0][index]
+    col = freeSpaces[1][index]
+    if verbose: print("Row/Col:", row, col, "freeSpaces:", freeSpaces)
+    return row,col
 
 def multiplayerGameLoop():
     for i in range((rows * cols)+5):
@@ -71,12 +76,13 @@ def playerDuckGameLoop(order={1:"network", 2:"player"}):
             return activePlayer
     print("nobody wins")
 
-def gameLoop(order={1:"duck", 2:"player"}, verbose=False):
+def gameLoop(order={1:"duck", 2:"duck"}, verbose=False):
     for i in range((rows*cols)+rows):
+        if verbose: board.fancyPrint()
         if i % 2 == 0:  active = 1
         else:           active = 2
         if order[active] == "duck":
-            if verbose: print("\nCOMPUTER TURN")
+            if verbose: print("\nCOMPUTER", active, "TURN")
             row, col = consultDuck(board.boardState, active, verbose=verbose)
         elif order[active] == "player":
             if verbose: print("\nPLAYER TURN")
@@ -88,10 +94,10 @@ def gameLoop(order={1:"duck", 2:"player"}, verbose=False):
         if board.check(nInRow, active):
             if verbose:
                 board.fancyPrint()
-                if active == 1: print("---------------------------- X wins\n")
-                else:           print("---------------------------- O wins\n")
+                if active == 1: print("---------------------------- X wins\n\n")
+                else:           print("---------------------------- O wins\n\n")
             return active
-    if verbose: print("nobody wins")
+    if verbose: print("---------------------------- DRAW\n\n")
 
 
 def duckDuckGameLoop(maxTurns=10, verbose=False, wait=False):
@@ -129,18 +135,15 @@ def trainAlgorithms(winner):
 ### TRAINING ###
 iterations = 10**5
 for i in range(iterations):
-    winner = duckDuckGameLoop()
+    winner = gameLoop(order={1:"duck", 2:"evilDuck"}, verbose=False)
     trainAlgorithms(winner)
     board.resetBoard()
     if i % (iterations/10) == 0:
-        duckDuckGameLoop(verbose=True)
+        gameLoop(order={1:"duck", 2:"evilDuck"}, verbose=True)
         print(i, (100*i)/iterations, "%")
 
-
-duckDuckGameLoop(verbose=True, wait=True)
-board.fancyPrint()
 print("\n\n\n")
 while True:
     board.resetBoard()
     #multiplayerGameLoop()
-    playerDuckGameLoop()
+    gameLoop(order={1:"duck", 2:"player"}, verbose=False)

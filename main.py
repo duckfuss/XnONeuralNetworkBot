@@ -7,10 +7,10 @@ import time
 rows, cols = 3,3
 board = boardController.Board(rows,cols)
 
-duckX = network.Network([rows*cols, 16, rows*cols], 1)
+duckX = network.Network([rows*cols, 16, 10, rows*cols], 1)
 duckX.generateNetwork()
 
-duckO = network.Network([rows*cols, 16, rows*cols], 2)
+duckO = network.Network([rows*cols, 16, 10, rows*cols], 2)
 duckO.generateNetwork()
 
 duckList = ["padding so index 1 = x etc.", duckX, duckO]
@@ -32,6 +32,7 @@ def consultDuck(boardState, player, verbose=False):
 
 def consultEvilDuck(boardState, verbose=False):
     '''This bot chooses next pos completly randomly'''
+    #if np.count_nonzero(boardState) == rows * cols:
     freeSpaces = np.where(boardState == 0)
     index = np.random.randint(len(freeSpaces[0]))
     row = freeSpaces[0][index]
@@ -39,45 +40,8 @@ def consultEvilDuck(boardState, verbose=False):
     if verbose: print("Row/Col:", row, col, "freeSpaces:", freeSpaces)
     return row,col
 
-def multiplayerGameLoop():
-    for i in range((rows * cols)+5):
-        board.fancyPrint()
-        if i % 2 == 0:
-            print("Xs turn")
-            player = 1
-        else:
-            print("Os turn")
-            player = 2
-        row, col = askPlayer()
-        board.editBoard(player, row, col)
-        if board.check(nInRow, player):
-            board.fancyPrint()
-            if player == 1: print("----------------------------X wins\n")
-            else:           print("----------------------------O wins\n")
-            return
-
-def playerDuckGameLoop(order={1:"network", 2:"player"}):
-    for i in range((rows * cols)+5):
-        if i % 2 == 0:  activePlayer, turn = order[1], 1
-        else:           activePlayer, turn = order[2], 2
-        if activePlayer == "network":
-            print("\nCOMPUTER TURN")
-            board.fancyPrint()
-            row, col = consultDuck(board.boardState, turn, verbose=True)
-        elif activePlayer == "player":
-            print("\nPLAYER TURN")
-            board.fancyPrint()
-            row, col = askPlayer()
-        board.editBoard(turn,row,col)
-        if board.check(nInRow, turn):
-            board.fancyPrint()
-            if turn == 1:   print("----------------------------X wins\n")
-            else:           print("----------------------------O wins\n")
-            return activePlayer
-    print("nobody wins")
-
 def gameLoop(order={1:"duck", 2:"duck"}, verbose=False):
-    for i in range((rows*cols)+rows):
+    for i in range(rows*cols):
         if verbose: board.fancyPrint()
         if i % 2 == 0:  active = 1
         else:           active = 2
@@ -89,7 +53,7 @@ def gameLoop(order={1:"duck", 2:"duck"}, verbose=False):
             row, col = askPlayer()
         elif order[active] == "evilDuck":
             if verbose: print("\nEVIL DUCK TURN")
-            row,col = consultEvilDuck(board.boardState, active, verbose=verbose)
+            row,col = consultEvilDuck(board.boardState, verbose=verbose)
         board.editBoard(active,row,col)
         if board.check(nInRow, active):
             if verbose:
@@ -98,32 +62,7 @@ def gameLoop(order={1:"duck", 2:"duck"}, verbose=False):
                 else:           print("---------------------------- O wins\n\n")
             return active
     if verbose: print("---------------------------- DRAW\n\n")
-
-
-def duckDuckGameLoop(maxTurns=10, verbose=False, wait=False):
-    '''Plays one game of duckX vs duckO'''
-    for turns in range(maxTurns):
-        if turns % 2 == 0:  activePlayer = 1
-        else:               activePlayer = 2
-        row, col = consultDuck(board.boardState, activePlayer, verbose=verbose)
-        if verbose: 
-            if wait: time.sleep(1) # debug
-            board.fancyPrint()
-            print("active player:", activePlayer)
-            print("turns taken:", turns)
-            print("next coords:", row, col)
-            print("\n\n")
-        board.editBoard(activePlayer, row, col)
-        if board.check(nInRow, activePlayer):
-            if verbose:
-                board.fancyPrint()
-                if activePlayer == 1:   print("---------------------------- X wins\n")
-                else:                   print("---------------------------- O wins\n")
-            return activePlayer
-    if verbose: print("---------------------------- DRAW\n")
-    return 0 # timeout -> nobody won :(
-
-
+    return 0
 
 def trainAlgorithms(winner):
     '''Post-game training and analysis'''
@@ -133,7 +72,7 @@ def trainAlgorithms(winner):
     
 
 ### TRAINING ###
-iterations = 10**5
+iterations = 10**6
 for i in range(iterations):
     winner = gameLoop(order={1:"duck", 2:"evilDuck"}, verbose=False)
     trainAlgorithms(winner)
@@ -146,4 +85,4 @@ print("\n\n\n")
 while True:
     board.resetBoard()
     #multiplayerGameLoop()
-    gameLoop(order={1:"duck", 2:"player"}, verbose=False)
+    gameLoop(order={1:"duck", 2:"player"}, verbose=True)

@@ -25,7 +25,8 @@ def askPlayer():
     return row, col
 
 def consultDuck(boardState, player, verbose=False):
-    output = duckList[player].compute(boardState).reshape(rows,cols)
+    compressed = np.divide(boardState, 2)
+    output = duckList[player].compute(compressed).reshape(rows,cols)
     (row,col) = np.unravel_index(output.argmax(), output.shape) # take the highest valued coord
     if verbose: print(output, row, col)
     return row, col

@@ -33,8 +33,9 @@ class Network():
             move = boardHist[i][1]          # tuple (row,col)
             delta = 0.5*(maths.exp(-0.2*((i-len(boardHist))/2))+0.5)
             # see https://www.desmos.com/calculator/xdpglvn3zc
-
-            output = self.compute(boardState).reshape(rows,cols)
+            
+            compressed = np.divide(boardState, 2)
+            output = self.compute(compressed).reshape(rows,cols)
             if winner == self.turn:
                 desired = np.full((rows,cols), 1 - delta)
                 desired[move[0]][move[1]] = delta

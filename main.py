@@ -7,10 +7,10 @@ import time
 rows, cols = 3,3
 board = boardController.Board(rows,cols)
 
-duckX = network.Network([rows*cols, 10, rows*cols], 1)
+duckX = network.Network([rows*cols, 10, 16, rows*cols], 1)
 duckX.generateNetwork()
 
-duckO = network.Network([rows*cols, 10, rows*cols], 2)
+duckO = network.Network([rows*cols, 10, 16, rows*cols], 2)
 duckO.generateNetwork()
 
 duckList = ["padding so index 1 = x etc.", duckX, duckO]
@@ -68,19 +68,18 @@ def multiplayerGameLoop():
             return
 
 def computerGameLoop(maxTurns=10, verbose=False, wait=False):
-    '''
-    Plays one game of duckX vs duckY
-    Changing turns to 1 will allow O to go first
-    '''
+    '''Plays one game of duckX vs duckO'''
     for turns in range(maxTurns):
         if turns % 2 == 0:  activePlayer = 1
         else:               activePlayer = 2
-        row, col = consultDuck(board.boardState, activePlayer)
+        row, col = consultDuck(board.boardState, activePlayer, verbose=verbose)
         if verbose: 
             if wait: time.sleep(1) # debug
             board.fancyPrint()
+            print("active player:", activePlayer)
             print("turns taken:", turns)
             print("next coords:", row, col)
+            print("\n\n")
         board.editBoard(activePlayer, row, col)
         if board.check(nInRow, activePlayer):
             if verbose:
@@ -91,26 +90,24 @@ def computerGameLoop(maxTurns=10, verbose=False, wait=False):
     if verbose: print("---------------------------- DRAW\n")
     return 0 # timeout -> nobody won :(
 
-def trainAlgorithms(winner):
+def trainAlgorithms(winner, verbose=False):
     '''Post-game training and analysis'''
-    duckList[1].trainNetwork(boardHist=board.boardHistory, winner=winner)
-    duckList[2].trainNetwork(boardHist=board.boardHistory, winner=winner)
+    duckList[1].trainNetwork(boardHist=board.boardHistory, winner=winner, verbose=verbose)
+    duckList[2].trainNetwork(boardHist=board.boardHistory, winner=winner, verbose=verbose)
 
     
 
 ### TRAINING ###
-iterations = 10**6
+iterations = 10**5
 for i in range(iterations):
-    winner = computerGameLoop()
+    winner = computerGameLoop(verbose=False)
     trainAlgorithms(winner)
     board.resetBoard()
-    if i % (iterations/10) == 0:
+    if i % (iterations/100) == 0:
         computerGameLoop(verbose=True)
+        trainAlgorithms(winner, verbose=True)
         print(i, (100*i)/iterations, "%")
 
-
-computerGameLoop(verbose=True, wait=True)
-board.fancyPrint()
 print("\n\n\n")
 while True:
     board.resetBoard()

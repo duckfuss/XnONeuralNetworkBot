@@ -1,9 +1,10 @@
 import random
 import numpy as np
+import math as maths
 # numpy setup
 np.set_printoptions(suppress=True,linewidth=np.nan)
-np.random.seed(5)
-random.seed(5)
+np.random.seed(1)
+random.seed(1)
 
 class Network():
     def __init__(self, layerData, turn) -> None:
@@ -15,7 +16,7 @@ class Network():
         for i in range(1,len(self.layerData)): # don't include input layer
             self.layersList.append(Layer(self.layerData[i-1], self.layerData[i]))
 
-    def trainNetwork(self, boardHist, winner):
+    def trainNetwork(self, boardHist, winner, verbose=False):
         '''
         Trains the network from the boardHist(ory)
         Current rules (apply equally to every past state!):
@@ -24,23 +25,32 @@ class Network():
         - if draw, desired state = array of 0.5s and "wrongish choice" is halved
         '''
         rows, cols = len(boardHist[0][0]), len(boardHist[0][0][0])
+        
         # FEED FORWARDS
         for i in range(self.turn-1, len(boardHist), 2):
             # loop over every other boardstate, (state 1 always goes first)
-            # calculate desired outputs
             boardState = boardHist[i][0]    # array of board state
             move = boardHist[i][1]          # tuple (row,col)
-            if winner == self.turn:
-                desired = np.zeros((rows,cols))
-                desired[move[0]][move[1]] = 1
-            elif winner != 0:
-                desired = np.full((rows,cols), 0.5)
-                desired[move[0]][move[1]] = 0
-            else: # draw/timeout
-                desired = np.full((rows,cols), 0.5)
-                desired[move[0]][move[1]] /= 2
-            # re-calculate actual output
+            delta = 0.5*(maths.exp(-0.2*((i-len(boardHist))/2))+0.5)
+            # see https://www.desmos.com/calculator/xdpglvn3zc
+
             output = self.compute(boardState).reshape(rows,cols)
+            if winner == self.turn:
+                desired = np.full((rows,cols), 1 - delta)
+                desired[move[0]][move[1]] = delta
+            elif winner != 0:
+                desired = np.full((rows,cols), delta)
+                desired[move[0]][move[1]] = 1 - delta
+            else: # draw/timeout
+                desired = np.random.rand(rows,cols)
+                #desired = np.full((rows,cols), 0.5)
+                desired[move[0]][move[1]] = 0
+            if verbose:
+                print("\n\nboardState: \n", boardState)
+                print("output: \n", output)
+                print("desired: \n", desired)
+                print("delta:", delta, " turn:", self.turn, " move", move)
+
             # calculate cost
             #  -> cost = self.cost(output,desired)
             layerCost = 2*(output-desired)
@@ -48,9 +58,10 @@ class Network():
             for layer in self.layersList[::-1]:
                 # loops through a shallow copy of reversed list
                 layerCost = layer.backpropogateLayer(layerCost)
+
         for layer in self.layersList:
             # apply the changes
-            layer.gradDesc(len(boardHist))
+            layer.gradDesc(len(boardHist), rate=3)
 
     def compute(self, inputs, verbose=False):
         inputs = (inputs.flatten().reshape(-1,1))/2

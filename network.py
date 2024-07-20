@@ -42,7 +42,8 @@ class Network():
                 desired = np.full((rows,cols), delta)
                 desired[move[0]][move[1]] = 1 - delta
             else: # draw/timeout
-                desired = np.full((rows,cols), 0.5)
+                desired = np.random.rand(rows,cols)
+                #desired = np.full((rows,cols), 0.5)
                 desired[move[0]][move[1]] = 0
             if verbose:
                 print("\n\nboardState: \n", boardState)

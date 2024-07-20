@@ -115,7 +115,7 @@ class Layer():
         self.weights -= (rate/sampleSize) * self.bufferedAdjust[0]
         self.biases -= (rate/sampleSize) * self.bufferedAdjust[1]
         self.bufferedAdjust = [0,0]
-
+ 
     def backpropAdjust(self, cost):
         '''
         Finds the derivatives for weights, biases, and prev layer

@@ -30,7 +30,28 @@ def consultDuck(boardState, player, verbose=False):
     if verbose: print(output, row, col)
     return row, col
 
-def playerGameLoop(order={1:"network", 2:"player"}):
+def consultEvilDuck(boardState):
+    
+    pass
+
+def multiplayerGameLoop():
+    for i in range((rows * cols)+5):
+        board.fancyPrint()
+        if i % 2 == 0:
+            print("Xs turn")
+            player = 1
+        else:
+            print("Os turn")
+            player = 2
+        row, col = askPlayer()
+        board.editBoard(player, row, col)
+        if board.check(nInRow, player):
+            board.fancyPrint()
+            if player == 1: print("----------------------------X wins\n")
+            else:           print("----------------------------O wins\n")
+            return
+
+def playerDuckGameLoop(order={1:"network", 2:"player"}):
     for i in range((rows * cols)+5):
         if i % 2 == 0:  activePlayer, turn = order[1], 1
         else:           activePlayer, turn = order[2], 2
@@ -50,24 +71,30 @@ def playerGameLoop(order={1:"network", 2:"player"}):
             return activePlayer
     print("nobody wins")
 
-def multiplayerGameLoop():
-    for i in range((rows * cols)+5):
-        board.fancyPrint()
-        if i % 2 == 0:
-            print("Xs turn")
-            player = 1
-        else:
-            print("Os turn")
-            player = 2
-        row, col = askPlayer()
-        board.editBoard(player, row, col)
-        if board.check(nInRow, player):
-            board.fancyPrint()
-            if player == 1: print("----------------------------X wins\n")
-            else:           print("----------------------------O wins\n")
-            return
+def gameLoop(order={1:"duck", 2:"player"}, verbose=False):
+    for i in range((rows*cols)+rows):
+        if i % 2 == 0:  active = 1
+        else:           active = 2
+        if order[active] == "duck":
+            if verbose: print("\nCOMPUTER TURN")
+            row, col = consultDuck(board.boardState, active, verbose=verbose)
+        elif order[active] == "player":
+            if verbose: print("\nPLAYER TURN")
+            row, col = askPlayer()
+        elif order[active] == "evilDuck":
+            if verbose: print("\nEVIL DUCK TURN")
+            row,col = consultEvilDuck(board.boardState, active, verbose=verbose)
+        board.editBoard(active,row,col)
+        if board.check(nInRow, active):
+            if verbose:
+                board.fancyPrint()
+                if active == 1: print("---------------------------- X wins\n")
+                else:           print("---------------------------- O wins\n")
+            return active
+    if verbose: print("nobody wins")
 
-def computerGameLoop(maxTurns=10, verbose=False, wait=False):
+
+def duckDuckGameLoop(maxTurns=10, verbose=False, wait=False):
     '''Plays one game of duckX vs duckO'''
     for turns in range(maxTurns):
         if turns % 2 == 0:  activePlayer = 1
@@ -90,6 +117,8 @@ def computerGameLoop(maxTurns=10, verbose=False, wait=False):
     if verbose: print("---------------------------- DRAW\n")
     return 0 # timeout -> nobody won :(
 
+
+
 def trainAlgorithms(winner):
     '''Post-game training and analysis'''
     duckList[1].trainNetwork(boardHist=board.boardHistory, winner=winner)
@@ -100,18 +129,18 @@ def trainAlgorithms(winner):
 ### TRAINING ###
 iterations = 10**5
 for i in range(iterations):
-    winner = computerGameLoop()
+    winner = duckDuckGameLoop()
     trainAlgorithms(winner)
     board.resetBoard()
     if i % (iterations/10) == 0:
-        computerGameLoop(verbose=True)
+        duckDuckGameLoop(verbose=True)
         print(i, (100*i)/iterations, "%")
 
 
-computerGameLoop(verbose=True, wait=True)
+duckDuckGameLoop(verbose=True, wait=True)
 board.fancyPrint()
 print("\n\n\n")
 while True:
     board.resetBoard()
     #multiplayerGameLoop()
-    playerGameLoop()
+    playerDuckGameLoop()

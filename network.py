@@ -31,9 +31,15 @@ class Network():
             # loop over every other boardstate, (state 1 always goes first)
             boardState = boardHist[i][0]    # array of board state
             move = boardHist[i][1]          # tuple (row,col)
+            
+            # see https://www.desmos.com/calculator/kjposrboae
             x = (i-(self.turn-1))/2 # maps i to 0,1,2,3...
-            delta = (0.5*maths.exp(0.2*(x-len(boardHist))))+0.5
-            # see https://www.desmos.com/calculator/owfq7vaas8
+            a = 0.2
+            if len(boardHist)%2 == 0:
+                b = len(boardHist)/2
+            else:
+                b = -1 + (len(boardHist) + (-2*self.turn)+3)/2
+            delta = (0.5*maths.exp(a*(x-b)))+0.5
             
             compressed = np.divide(boardState, 2)
             output = self.compute(compressed).reshape(rows,cols)
@@ -53,7 +59,7 @@ class Network():
                 print("output: \n", output, move)
                 print("desired: \n", desired)
                 print("delta:", delta, " lenBH:", len(boardHist))
-                print("turn:", self.turn, " i:", i, " x:", x)
+                print("turn:", self.turn, " i:", i, " x:", x, " b:", b)
 
             # calculate cost
             #  -> cost = self.cost(output,desired)

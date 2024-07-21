@@ -84,7 +84,7 @@ def trainAlgorithms(winner, verbose=False):
     
 
 ### TRAINING ###
-iterations = 10**6
+iterations = 10**5
 wins, draws = 0, 0
 for i in range(iterations):
     # X vs Random

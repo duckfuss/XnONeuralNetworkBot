@@ -36,8 +36,8 @@ def consultDuck(boardState, player, verbose=False):
         row, col = freeSpaces[0][space], freeSpaces[1][space]
         if output[row][col] > output[maxRow][maxCol]:
             maxRow, maxCol = row, col
-    if verbose: print(output, row, col)
-    return row, col
+    if verbose: print(output, maxRow, maxCol, "\n", freeSpaces)
+    return maxRow, maxCol
 
 
 def consultEvilDuck(boardState, verbose=False):
@@ -76,10 +76,10 @@ def gameLoop(order={1:"duck", 2:"duck"}, verbose=False):
     if verbose: print("---------------------------- DRAW\n\n")
     return 0
 
-def trainAlgorithms(winner):
+def trainAlgorithms(winner, verbose=False):
     '''Post-game training and analysis'''
-    duckList[1].trainNetwork(boardHist=board.boardHistory, winner=winner)
-    duckList[2].trainNetwork(boardHist=board.boardHistory, winner=winner)
+    duckList[1].trainNetwork(boardHist=board.boardHistory, winner=winner, verbose=verbose)
+    duckList[2].trainNetwork(boardHist=board.boardHistory, winner=winner, verbose=verbose)
 
     
 
@@ -104,8 +104,9 @@ for i in range(iterations):
     trainAlgorithms(winner)
     board.resetBoard()
 
-    if i % (iterations/100) == 0:
+    if i % (iterations/10) == 0:
         gameLoop(order={1:"duck", 2:"duck"}, verbose=True)
+        trainAlgorithms(winner, verbose=True)
         board.resetBoard()
         print(i, (100*i)/iterations, "%")
         print("X vs random:\n\t", (100*wins)/(i+1), "% won\n\t", 

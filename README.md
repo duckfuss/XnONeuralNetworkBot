@@ -6,4 +6,4 @@
 - there is also no pickling, the program must train before you can play
 
 ## Screenshot
-<img width="354" alt="Screenshot 2024-07-21 at 2 51 33 PM" src="https://github.com/user-attachments/assets/907b9ff8-f3d3-4bb9-8cbb-a46b15c2922b">
+<img width="323" alt="Screenshot 2024-07-21 at 2 52 34 PM" src="https://github.com/user-attachments/assets/328c7df9-4fe9-4afc-b1f1-57c4565e231a">

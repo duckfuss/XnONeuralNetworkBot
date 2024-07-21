@@ -35,10 +35,8 @@ class Network():
             # see https://www.desmos.com/calculator/kjposrboae
             x = (i-(self.turn-1))/2 # maps i to 0,1,2,3...
             a = 0.2
-            if len(boardHist)%2 == 0:
-                b = len(boardHist)/2
-            else:
-                b = -1 + (len(boardHist) + (-2*self.turn)+3)/2
+            if len(boardHist)%2 == 0:   b = len(boardHist)/2
+            else:   b = -1 + (len(boardHist) + (-2*self.turn)+3)/2
             delta = (0.5*maths.exp(a*(x-b)))+0.5
             
             compressed = np.divide(boardState, 2)

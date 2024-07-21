@@ -7,10 +7,10 @@ import time
 rows, cols = 3,3
 board = boardController.Board(rows,cols)
 
-duckX = network.Network([rows*cols, 9, 9, rows*cols], 1)
+duckX = network.Network([rows*cols, rows*cols], 1)
 duckX.generateNetwork()
 
-duckO = network.Network([rows*cols, 9, 9, rows*cols], 2)
+duckO = network.Network([rows*cols, rows*cols], 2)
 duckO.generateNetwork()
 
 duckList = ["padding so index 1 = x etc.", duckX, duckO]
@@ -20,8 +20,9 @@ duckList = ["padding so index 1 = x etc.", duckX, duckO]
 nInRow = 3
 
 def askPlayer():
-    col = int(input("what col?: "))
+    '''returns chosen row and col of the player'''
     row = int(input("what row?: "))
+    col = int(input("what col?: "))
     return row, col
 
 
@@ -42,7 +43,6 @@ def consultDuck(boardState, player, verbose=False):
 
 def consultEvilDuck(boardState, verbose=False):
     '''This bot chooses next pos completly randomly'''
-    #if np.count_nonzero(boardState) == rows * cols:
     freeSpaces = np.where(boardState == 0)
     index = np.random.randint(len(freeSpaces[0]))
     row = freeSpaces[0][index]
@@ -51,6 +51,13 @@ def consultEvilDuck(boardState, verbose=False):
     return row,col
 
 def gameLoop(order={1:"duck", 2:"duck"}, verbose=False):
+    '''
+    plays one match of XnO
+    change order{} to:
+      "duck"        for an AI
+      "player"      for asking the player
+      "evilDuck"    for a random choice
+    '''
     for i in range(rows*cols):
         if verbose: board.fancyPrint()
         if i % 2 == 0:  active = 1
@@ -100,9 +107,9 @@ for i in range(iterations):
     board.resetBoard()
     
     # X vs O
-    winner = gameLoop(order={1:"duck", 2:"duck"}, verbose=False)
-    trainAlgorithms(winner)
-    board.resetBoard()
+    #winner = gameLoop(order={1:"duck", 2:"duck"}, verbose=False)
+    #trainAlgorithms(winner)
+    #board.resetBoard()
 
     if i % (iterations/10) == 0:
         gameLoop(order={1:"duck", 2:"duck"}, verbose=True)

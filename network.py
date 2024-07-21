@@ -3,8 +3,8 @@ import numpy as np
 import math as maths
 # numpy setup
 np.set_printoptions(suppress=True,linewidth=np.nan)
-np.random.seed(1)
-random.seed(1)
+#np.random.seed(1)
+#random.seed(1)
 
 class Network():
     def __init__(self, layerData, turn) -> None:
@@ -60,10 +60,14 @@ class Network():
             for layer in self.layersList[::-1]:
                 # loops through a shallow copy of reversed list
                 layerCost = layer.backpropogateLayer(layerCost)
-
+        
+        # choose a learning rate based off win/loss/draw
+        if winner == self.turn: learnRate = 3
+        elif winner != 0:       learnRate = 10
+        else:                   learnRate = 5
         for layer in self.layersList:
             # apply the changes
-            layer.gradDesc(len(boardHist), rate=3)
+            layer.gradDesc(len(boardHist), rate=learnRate)
 
     def compute(self, inputs, verbose=False):
         inputs = (inputs.flatten().reshape(-1,1))/2

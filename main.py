@@ -7,10 +7,10 @@ import time
 rows, cols = 3,3
 board = boardController.Board(rows,cols)
 
-duckX = network.Network([rows*cols, 16, rows*cols], 1)
+duckX = network.Network([rows*cols, 9, 9, rows*cols], 1)
 duckX.generateNetwork()
 
-duckO = network.Network([rows*cols, 16, rows*cols], 2)
+duckO = network.Network([rows*cols, 9, 9, rows*cols], 2)
 duckO.generateNetwork()
 
 duckList = ["padding so index 1 = x etc.", duckX, duckO]
@@ -31,8 +31,7 @@ def consultDuck(boardState, player, verbose=False):
     output = duckList[player].compute(compressed).reshape(rows,cols)
     freeSpaces = np.where(boardState == 0) 
     # 2 arrays, one for xcoord, one for correspinding ycoord
-    freeOutputList, freeCoordsList = [], []
-    maxRow, maxCol = 0, 0
+    maxRow, maxCol = freeSpaces[0][0], freeSpaces[1][0]
     for space in range(len(freeSpaces[0])):
         row, col = freeSpaces[0][space], freeSpaces[1][space]
         if output[row][col] > output[maxRow][maxCol]:
@@ -56,6 +55,7 @@ def gameLoop(order={1:"duck", 2:"duck"}, verbose=False):
         if verbose: board.fancyPrint()
         if i % 2 == 0:  active = 1
         else:           active = 2
+
         if order[active] == "duck":
             if verbose: print("\nCOMPUTER", active, "TURN")
             row, col = consultDuck(board.boardState, active, verbose=verbose)
@@ -65,6 +65,7 @@ def gameLoop(order={1:"duck", 2:"duck"}, verbose=False):
         elif order[active] == "evilDuck":
             if verbose: print("\nEVIL DUCK TURN")
             row,col = consultEvilDuck(board.boardState, verbose=verbose)
+
         board.editBoard(active,row,col)
         if board.check(nInRow, active):
             if verbose:
@@ -84,31 +85,33 @@ def trainAlgorithms(winner):
 
 ### TRAINING ###
 iterations = 10**6
+wins, draws = 0, 0
 for i in range(iterations):
     # X vs Random
     winner = gameLoop(order={1:"duck", 2:"evilDuck"}, verbose=False)
     trainAlgorithms(winner)
     board.resetBoard()
+    if winner == 1: wins += 1
+    elif winner == 0: draws += 1
 
     # O vs Random
     winner = gameLoop(order={1:"evilDuck", 2:"duck"}, verbose=False)
     trainAlgorithms(winner)
     board.resetBoard()
     
-    if i % (iterations/10) == 0:
-        gameLoop(order={1:"duck", 2:"duck"}, verbose=True)
-        board.resetBoard()
-        print(i, (100*i)/iterations, "%")
-
-for i in range(iterations):
+    # X vs O
     winner = gameLoop(order={1:"duck", 2:"duck"}, verbose=False)
     trainAlgorithms(winner)
     board.resetBoard()
 
-    if i % (iterations/10) == 0:
+    if i % (iterations/100) == 0:
         gameLoop(order={1:"duck", 2:"duck"}, verbose=True)
         board.resetBoard()
         print(i, (100*i)/iterations, "%")
+        print("X vs random:\n\t", (100*wins)/(i+1), "% won\n\t", 
+              (100*draws)/(i+1), "%", "drawn\n\t", 
+              (100*(i-wins-draws))/(i+1), "%", "lost")
+
 
 print("\n\n\n")
 while True:

@@ -20,8 +20,8 @@ duckList = ["padding so index 1 = x etc.", duckX, duckO]
 nInRow = 3
 
 def askPlayer():
-    row = int(input("what row?: "))
-    col = int(input("what col?: "))
+    col = int(input("what col?: ")) + 1
+    row = int(input("what row?: ")) + 1
     return row, col
 '''
 def consultDuck(boardState, player, verbose=False):
@@ -33,6 +33,7 @@ def consultDuck(boardState, player, verbose=False):
 '''
 
 def consultDuck(boardState, player, verbose=False):
+    '''picks highest legal move'''
     compressed = np.divide(boardState, 2)
     output = duckList[player].compute(compressed).reshape(rows,cols)
     freeSpaces = np.where(boardState == 0) 
@@ -43,6 +44,7 @@ def consultDuck(boardState, player, verbose=False):
         row, col = freeSpaces[0][space], freeSpaces[1][space]
         if output[row][col] > output[maxRow][maxCol]:
             maxRow, maxCol = row, col
+    if verbose: print(output, row, col)
     return row, col
 
 
@@ -90,11 +92,28 @@ def trainAlgorithms(winner):
 ### TRAINING ###
 iterations = 10**6
 for i in range(iterations):
+    # X vs Random
     winner = gameLoop(order={1:"duck", 2:"evilDuck"}, verbose=False)
     trainAlgorithms(winner)
     board.resetBoard()
+
+    # O vs Random
+    winner = gameLoop(order={1:"evilDuck", 2:"duck"}, verbose=False)
+    trainAlgorithms(winner)
+    board.resetBoard()
+    
     if i % (iterations/10) == 0:
-        gameLoop(order={1:"duck", 2:"evilDuck"}, verbose=True)
+        gameLoop(order={1:"duck", 2:"duck"}, verbose=True)
+        board.resetBoard()
+        print(i, (100*i)/iterations, "%")
+
+for i in range(iterations):
+    winner = gameLoop(order={1:"duck", 2:"duck"}, verbose=False)
+    trainAlgorithms(winner)
+    board.resetBoard()
+
+    if i % (iterations/10) == 0:
+        gameLoop(order={1:"duck", 2:"duck"}, verbose=True)
         board.resetBoard()
         print(i, (100*i)/iterations, "%")
 

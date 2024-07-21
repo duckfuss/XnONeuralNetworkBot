@@ -19,10 +19,10 @@ class Network():
     def trainNetwork(self, boardHist, winner, verbose=False):
         '''
         Trains the network from the boardHist(ory)
-        Current rules (apply equally to every past state!):
-        - if win, desired state = array of 0s with a 1 on "correct choice"
-        - if loss, desired state = array of 0.5s with a 0 on "wrong choice"
-        - if draw, desired state = array of 0.5s and "wrongish choice" is halved
+        Current rules (applied in a decaying fashion as per delta):
+        - if win, desired state = array of (1-delta) with a "delta" on "correct choice"
+        - if loss, desired state = array of "delta" with a (1-delta) on "wrong choice"
+        - if draw, desired state = same as win
         '''
         rows, cols = len(boardHist[0][0]), len(boardHist[0][0][0])
         
@@ -32,10 +32,11 @@ class Network():
             boardState = boardHist[i][0]    # array of board state
             move = boardHist[i][1]          # tuple (row,col)
             delta = 0.5*(maths.exp(-0.2*((i-len(boardHist))/2))+0.5)
-            # see https://www.desmos.com/calculator/xdpglvn3zc
+            # see https://www.desmos.com/calculator/owfq7vaas8
             
             compressed = np.divide(boardState, 2)
             output = self.compute(compressed).reshape(rows,cols)
+
             if winner == self.turn:
                 desired = np.full((rows,cols), 1 - delta)
                 desired[move[0]][move[1]] = delta
@@ -43,9 +44,9 @@ class Network():
                 desired = np.full((rows,cols), delta)
                 desired[move[0]][move[1]] = 1 - delta
             else: # draw/timeout
-                desired = np.random.rand(rows,cols)
-                #desired = np.full((rows,cols), 0.5)
-                desired[move[0]][move[1]] = 0
+                #desired = np.random.rand(rows,cols)
+                desired = np.full((rows,cols), 1-delta)
+                desired[move[0]][move[1]] = delta
             if verbose:
                 print("\n\nboardState: \n", boardState)
                 print("output: \n", output)
@@ -140,5 +141,3 @@ def sigmoid(x):
     return 1/(1+np.exp(-x))
 def dsigmoid(x):
     return sigmoid(x) * (1-sigmoid(x))
-
-

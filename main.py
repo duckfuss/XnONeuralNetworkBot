@@ -20,8 +20,8 @@ duckList = ["padding so index 1 = x etc.", duckX, duckO]
 nInRow = 3
 
 def askPlayer():
-    col = int(input("what col?: ")) + 1
-    row = int(input("what row?: ")) + 1
+    col = int(input("what col?: "))
+    row = int(input("what row?: "))
     return row, col
 '''
 def consultDuck(boardState, player, verbose=False):

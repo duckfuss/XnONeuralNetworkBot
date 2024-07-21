@@ -37,7 +37,7 @@ def consultDuck(boardState, player, verbose=False):
         row, col = freeSpaces[0][space], freeSpaces[1][space]
         if output[row][col] > output[maxRow][maxCol]:
             maxRow, maxCol = row, col
-    if verbose: print(output, maxRow, maxCol, "\n", freeSpaces)
+    if verbose: print(output, maxRow, maxCol)
     return maxRow, maxCol
 
 
@@ -91,7 +91,7 @@ def trainAlgorithms(winner, verbose=False):
     
 
 ### TRAINING ###
-iterations = 10**5
+iterations = 10**4
 wins, draws = 0, 0
 for i in range(iterations):
     # X vs Random
@@ -108,13 +108,13 @@ for i in range(iterations):
 
 
     if i % (iterations/10) == 0:
-        gameLoop(order={1:"duck", 2:"duck"}, verbose=True)
-        trainAlgorithms(winner, verbose=True)
+        gameLoop(order={1:"duck", 2:"duck"}, verbose=False)
+        trainAlgorithms(winner, verbose=False)
         board.resetBoard()
-        print(i, (100*i)/iterations, "%DONE")
-        print("X vs random:\n\t", (100*wins)/(i+1), "% won\n\t", 
-              (100*draws)/(i+1), "%", "drawn\n\t", 
-              (100*(i-wins-draws))/(i+1), "%", "lost")
+        print(i, "games\t", (100*i)/iterations, "%", "complete\n")
+        print((100*wins)/(i+1), "%\t won\n", 
+              (100*draws)/(i+1), "%\t", " drawn\n", 
+              (100*(i-wins-draws))/(i+1), "%\t", " lost\n\n", sep="")
 
 print("FINAL STEP")
 for i in range(int(iterations/10)):
@@ -127,5 +127,6 @@ print("TRAINING OVER\n\n\n")
 ## PLAYING ##
 while True:
     board.resetBoard()
-    #multiplayerGameLoop()
     gameLoop(order={1:"duck", 2:"player"}, verbose=True)
+    # uncoment below to play X
+    #gameLoop(order={2:"duck", 1:"player"}, verbose=True)

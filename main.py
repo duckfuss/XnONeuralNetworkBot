@@ -23,14 +23,7 @@ def askPlayer():
     col = int(input("what col?: "))
     row = int(input("what row?: "))
     return row, col
-'''
-def consultDuck(boardState, player, verbose=False):
-    compressed = np.divide(boardState, 2)
-    output = duckList[player].compute(compressed).reshape(rows,cols)
-    (row,col) = np.unravel_index(output.argmax(), output.shape) # take the highest valued coord
-    if verbose: print(output, row, col)
-    return row, col
-'''
+
 
 def consultDuck(boardState, player, verbose=False):
     '''picks highest legal move'''

@@ -1,10 +1,12 @@
 import boardController
 import network
 import numpy as np
-import time
+
+# variables - can be changed
+nInRow = 3
+rows, cols = 3,3
 
 # initialisations
-rows, cols = 3,3
 board = boardController.Board(rows,cols)
 
 duckX = network.Network([rows*cols, rows*cols], 1)
@@ -13,11 +15,9 @@ duckX.generateNetwork()
 duckO = network.Network([rows*cols, rows*cols], 2)
 duckO.generateNetwork()
 
-duckList = ["padding so index 1 = x etc.", duckX, duckO]
-# 1 = X, 2 = Y
+duckList = ["padding so index 1 = x etc.", duckX, duckO] # 1 = X, 2 = Y
 
-# Variables :)
-nInRow = 3
+
 
 def askPlayer():
     '''returns chosen row and col of the player'''
@@ -105,23 +105,26 @@ for i in range(iterations):
     winner = gameLoop(order={1:"evilDuck", 2:"duck"}, verbose=False)
     trainAlgorithms(winner)
     board.resetBoard()
-    
-    # X vs O
-    #winner = gameLoop(order={1:"duck", 2:"duck"}, verbose=False)
-    #trainAlgorithms(winner)
-    #board.resetBoard()
+
 
     if i % (iterations/10) == 0:
         gameLoop(order={1:"duck", 2:"duck"}, verbose=True)
         trainAlgorithms(winner, verbose=True)
         board.resetBoard()
-        print(i, (100*i)/iterations, "%")
+        print(i, (100*i)/iterations, "%DONE")
         print("X vs random:\n\t", (100*wins)/(i+1), "% won\n\t", 
               (100*draws)/(i+1), "%", "drawn\n\t", 
               (100*(i-wins-draws))/(i+1), "%", "lost")
 
+print("FINAL STEP")
+for i in range(int(iterations/10)):
+    # Ai vs Ai
+    winner = gameLoop(order={1:"duck", 2:"duck"}, verbose=False)
+    trainAlgorithms(winner)
+    board.resetBoard()
+print("TRAINING OVER\n\n\n")
 
-print("\n\n\n")
+## PLAYING ##
 while True:
     board.resetBoard()
     #multiplayerGameLoop()

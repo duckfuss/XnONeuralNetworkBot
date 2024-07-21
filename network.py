@@ -3,8 +3,6 @@ import numpy as np
 import math as maths
 # numpy setup
 np.set_printoptions(suppress=True,linewidth=np.nan)
-#np.random.seed(1)
-#random.seed(1)
 
 class Network():
     def __init__(self, layerData, turn) -> None:

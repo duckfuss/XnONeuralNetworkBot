@@ -15,9 +15,8 @@ class Board():
     def editBoard(self, value, row, col):
         '''allows board to be easily edited from other files'''
         if self.boardState[row][col] == 0:
-            # Currently the only punishment for illegal placement is missing a turn
             self.boardState[row][col] = value
-        self.boardHistory.append([self.boardState, (row,col)])
+        self.boardHistory.append([self.boardState.copy(), (row,col)])
         
     def check(self, nInRow, value):
         '''

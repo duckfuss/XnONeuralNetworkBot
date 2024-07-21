@@ -3,8 +3,8 @@ import numpy as np
 import math as maths
 # numpy setup
 np.set_printoptions(suppress=True,linewidth=np.nan)
-np.random.seed(1)
-random.seed(1)
+#np.random.seed(1)
+#random.seed(1)
 
 class Network():
     def __init__(self, layerData, turn) -> None:
@@ -16,32 +16,49 @@ class Network():
         for i in range(1,len(self.layerData)): # don't include input layer
             self.layersList.append(Layer(self.layerData[i-1], self.layerData[i]))
 
-    def trainNetwork(self, boardHist, winner):
+    def trainNetwork(self, boardHist, winner, verbose=False):
         '''
         Trains the network from the boardHist(ory)
-        Current rules (apply equally to every past state!):
-        - if win, desired state = array of 0s with a 1 on "correct choice"
-        - if loss, desired state = array of 0.5s with a 0 on "wrong choice"
-        - if draw, desired state = array of 0.5s and "wrongish choice" is halved
+        Current rules (applied in a decaying fashion as per delta):
+        - if win, desired state = array of (1-delta) with a "delta" on "correct choice"
+        - if loss, desired state = array of "delta" with a (1-delta) on "wrong choice"
+        - if draw, desired state = same as win
         '''
         rows, cols = len(boardHist[0][0]), len(boardHist[0][0][0])
+        
         # FEED FORWARDS
         for i in range(self.turn-1, len(boardHist), 2):
             # loop over every other boardstate, (state 1 always goes first)
             boardState = boardHist[i][0]    # array of board state
             move = boardHist[i][1]          # tuple (row,col)
             
+            # see https://www.desmos.com/calculator/kjposrboae
+            x = (i-(self.turn-1))/2 # maps i to 0,1,2,3...
+            a = 0.2
+            if len(boardHist)%2 == 0:   b = len(boardHist)/2
+            else:   b = -1 + (len(boardHist) + (-2*self.turn)+3)/2
+            delta = (0.5*maths.exp(a*(x-b)))+0.5
+            
+            compressed = np.divide(boardState, 2)
+            output = self.compute(compressed).reshape(rows,cols)
+
             if winner == self.turn:
-                desired = np.zeros((rows,cols))
-                desired[move[0]][move[1]] = 1
+                desired = np.full((rows,cols), 1 - delta)
+                desired[move[0]][move[1]] = delta
             elif winner != 0:
-                desired = np.full((rows,cols), 1)
-                desired[move[0]][move[1]] = 0
+                desired = np.full((rows,cols), delta)
+                desired[move[0]][move[1]] = 1 - delta
             else: # draw/timeout
-                desired = np.full((rows,cols), 0.5)
-                desired[move[0]][move[1]] = 0.25
-            # re-calculate actual output
-            output = self.compute(boardState).reshape(rows,cols)
+                #desired = np.random.rand(rows,cols)
+                desired = np.full((rows,cols), 1-delta)
+                desired[move[0]][move[1]] = delta
+            if verbose:
+                print("\n\nboardState: \n", boardState)
+                print("output: \n", output, move)
+                print("desired: \n", desired)
+                print("delta:", delta, " lenBH:", len(boardHist))
+                print("turn:", self.turn, " i:", i, " x:", x, " b:", b)
+
             # calculate cost
             #  -> cost = self.cost(output,desired)
             layerCost = 2*(output-desired)
@@ -49,9 +66,14 @@ class Network():
             for layer in self.layersList[::-1]:
                 # loops through a shallow copy of reversed list
                 layerCost = layer.backpropogateLayer(layerCost)
+        
+        # choose a learning rate based off win/loss/draw
+        if winner == self.turn: learnRate = 3
+        elif winner != 0:       learnRate = 5
+        else:                   learnRate = 4
         for layer in self.layersList:
             # apply the changes
-            layer.gradDesc(len(boardHist), rate=10)
+            layer.gradDesc(len(boardHist), rate=learnRate)
 
     def compute(self, inputs, verbose=False):
         inputs = (inputs.flatten().reshape(-1,1))/2
@@ -105,7 +127,7 @@ class Layer():
         self.weights -= (rate/sampleSize) * self.bufferedAdjust[0]
         self.biases -= (rate/sampleSize) * self.bufferedAdjust[1]
         self.bufferedAdjust = [0,0]
-
+ 
     def backpropAdjust(self, cost):
         '''
         Finds the derivatives for weights, biases, and prev layer

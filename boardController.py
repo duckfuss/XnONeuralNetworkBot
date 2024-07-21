@@ -15,9 +15,8 @@ class Board():
     def editBoard(self, value, row, col):
         '''allows board to be easily edited from other files'''
         if self.boardState[row][col] == 0:
-            # Currently the only punishment for illegal placement is missing a turn
             self.boardState[row][col] = value
-        self.boardHistory.append([self.boardState, (row,col)])
+        self.boardHistory.append([self.boardState.copy(), (row,col)])
         
     def check(self, nInRow, value):
         '''
@@ -39,7 +38,8 @@ class Board():
     
     def searchAhead(self, direc, row, col, n, positive):
         '''Utility function called only by check(), don't call elsewhere'''
-        nD = {"Vert":[1,0], "Hor":[0,1], "diagUp":[-1,1], "diagDo":[1,1]} # neighbour data
+        nD = {"Vert":[1,0], "Hor":[0,1], "diagUp":[-1,1], "diagDo":[1,1]} 
+        # neighbour data
         for i in range(n-1):
             row += nD[direc][0]
             col += nD[direc][1]
@@ -52,13 +52,16 @@ class Board():
 
     def fancyPrint(self, charDict = {0:"  ", 1:"❌", 2:"⭕️"}):
         '''Utility function that prints self.boardState using nice ascii grid chars'''
+        for col in range(self.cols):
+            print(" ", col, end=" ")
+        print("") # new line
         for row in range(self.rows):
-            print(" ", end="")
+            print(row, end=" ")
             for col in range(self.cols-1):
                 print(charDict[self.boardState[row][col]], end="┃ ")
             print(charDict[self.boardState[row][col+1]])
             if row != self.rows-1:
-                print("━", end="")
+                print(" ━", end="")
                 for i in range(self.cols-1):
                     print("━━╋━", end="")
                 print("━━")

@@ -1,5 +1,5 @@
 import boardController
-import network
+import MLP
 import numpy as np
 
 # variables - can be changed
@@ -9,10 +9,10 @@ rows, cols = 3,3
 # initialisations
 board = boardController.Board(rows,cols)
 
-duckX = network.Network([rows*cols, rows*cols], 1)
+duckX = MLP.Network([rows*cols, rows*cols], 1)
 duckX.generateNetwork()
 
-duckO = network.Network([rows*cols, rows*cols], 2)
+duckO = MLP.Network([rows*cols, rows*cols], 2)
 duckO.generateNetwork()
 
 duckList = ["padding so index 1 = x etc.", duckX, duckO] # 1 = X, 2 = Y

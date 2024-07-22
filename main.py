@@ -1,5 +1,5 @@
 import boardController
-import MLP
+import networks.MLP as MLP
 import numpy as np
 
 # variables - can be changed
